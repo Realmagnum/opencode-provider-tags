@@ -7,9 +7,16 @@ import type { ProviderItem, ProviderTagsState } from './contract.js';
 
 const CONFIG_DIR = path.join(os.homedir(), '.config', 'opencode');
 const PLUGIN_ROOT = path.join(CONFIG_DIR, 'plugins', 'provider-tags');
-const OPENCODE_CONFIG_PATH = path.join(CONFIG_DIR, 'opencode.jsonc');
 const SETTINGS_PATH = path.join(PLUGIN_ROOT, 'settings.json');
 const CANONICAL_PATH = path.join(PLUGIN_ROOT, 'canonical-models.json');
+
+export function getOpenCodeConfigPath(): string {
+  const jsonc = path.join(CONFIG_DIR, 'opencode.jsonc');
+  if (fs.existsSync(jsonc)) return jsonc;
+  const json = path.join(CONFIG_DIR, 'opencode.json');
+  if (fs.existsSync(json)) return json;
+  return jsonc;
+}
 
 function stripBom(str: string): string {
   if (typeof str === 'string' && str.charCodeAt(0) === 0xFEFF) {
@@ -80,12 +87,13 @@ export function getPluginState(): ProviderTagsState {
   }
 
   let config: any = {};
-  if (fs.existsSync(OPENCODE_CONFIG_PATH)) {
+  const configPath = getOpenCodeConfigPath();
+  if (fs.existsSync(configPath)) {
     try {
-      const raw = fs.readFileSync(OPENCODE_CONFIG_PATH, 'utf8');
+      const raw = fs.readFileSync(configPath, 'utf8');
       config = parseJsonc(stripBom(raw)) || {};
     } catch (err) {
-      console.error('[provider-tags] Failed to parse opencode.jsonc:', err);
+      console.error('[provider-tags] Failed to parse opencode config:', err);
     }
   }
 
@@ -131,16 +139,17 @@ export function getPluginState(): ProviderTagsState {
 }
 
 export function applySettings(newSettings: { enabled: boolean; tags: Record<string, string> }) {
-  if (!fs.existsSync(OPENCODE_CONFIG_PATH)) {
+  const configPath = getOpenCodeConfigPath();
+  if (!fs.existsSync(configPath)) {
     return {
       success: false,
       errors: {},
-      message: 'opencode.jsonc not found',
+      message: `${path.basename(configPath)} not found`,
       modifiedCount: 0,
     };
   }
 
-  const rawConfig = fs.readFileSync(OPENCODE_CONFIG_PATH, 'utf8');
+  const rawConfig = fs.readFileSync(configPath, 'utf8');
   let config: any;
   try {
     config = parseJsonc(stripBom(rawConfig));
@@ -148,7 +157,7 @@ export function applySettings(newSettings: { enabled: boolean; tags: Record<stri
     return {
       success: false,
       errors: {},
-      message: `Failed to parse opencode.jsonc: ${err.message}`,
+      message: `Failed to parse ${path.basename(configPath)}: ${err.message}`,
       modifiedCount: 0,
     };
   }
@@ -183,9 +192,9 @@ export function applySettings(newSettings: { enabled: boolean; tags: Record<stri
     } catch {}
   }
 
-  // Backup opencode.jsonc before modifying
+  // Backup config before modifying
   try {
-    fs.writeFileSync(`${OPENCODE_CONFIG_PATH}.bak-before-apply`, rawConfig, 'utf8');
+    fs.writeFileSync(`${configPath}.bak-before-apply`, rawConfig, 'utf8');
   } catch (err) {
     console.error('[provider-tags] Backup write error:', err);
   }
@@ -234,9 +243,15 @@ export function applySettings(newSettings: { enabled: boolean; tags: Record<stri
     }
   }
 
-  // Write updated opencode.jsonc
+  // Write updated config
   if (modifiedCount > 0) {
-    fs.writeFileSync(OPENCODE_CONFIG_PATH, updatedText, 'utf8');
+    fs.writeFileSync(configPath, updatedText, 'utf8');
+  }
+
+  if (!fs.existsSync(PLUGIN_ROOT)) {
+    try {
+      fs.mkdirSync(PLUGIN_ROOT, { recursive: true });
+    } catch {}
   }
 
   // Persist updated canonical models
@@ -266,11 +281,12 @@ export function applySettings(newSettings: { enabled: boolean; tags: Record<stri
 }
 
 export function resetToCanonical() {
-  if (!fs.existsSync(OPENCODE_CONFIG_PATH)) {
-    return { success: false, message: 'opencode.jsonc not found', modifiedCount: 0 };
+  const configPath = getOpenCodeConfigPath();
+  if (!fs.existsSync(configPath)) {
+    return { success: false, message: `${path.basename(configPath)} not found`, modifiedCount: 0 };
   }
 
-  const rawConfig = fs.readFileSync(OPENCODE_CONFIG_PATH, 'utf8');
+  const rawConfig = fs.readFileSync(configPath, 'utf8');
   let config: any;
   try {
     config = parseJsonc(stripBom(rawConfig));
@@ -287,7 +303,7 @@ export function resetToCanonical() {
 
   // Backup before reset
   try {
-    fs.writeFileSync(`${OPENCODE_CONFIG_PATH}.bak-before-reset`, rawConfig, 'utf8');
+    fs.writeFileSync(`${configPath}.bak-before-reset`, rawConfig, 'utf8');
   } catch (err) {
     console.error('[provider-tags] Backup write error:', err);
   }
@@ -320,7 +336,7 @@ export function resetToCanonical() {
   }
 
   if (modifiedCount > 0) {
-    fs.writeFileSync(OPENCODE_CONFIG_PATH, updatedText, 'utf8');
+    fs.writeFileSync(configPath, updatedText, 'utf8');
   }
 
   const newSettings = {
