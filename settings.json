@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "tags": {
+    "antigravity": "[AG]",
+    "antigravity-manager": "[AGM]",
+    "cpamp": "[CPAMP]",
+    "spiderssense": "[SS]",
+    "llama-swap": "[LS]",
+    "polza_ai": "[Polza]",
+    "openrouter": "[OR]"
+  }
+}

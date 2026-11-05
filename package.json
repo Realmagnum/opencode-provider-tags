@@ -1,0 +1,58 @@
+{
+  "name": "opencode-provider-tags",
+  "version": "1.0.0",
+  "description": "Provider suffixes and duplicate model disambiguation plugin for OpenCode Desktop",
+  "author": "Realmagnum <realmagnum@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Realmagnum/opencode-provider-tags.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Realmagnum/opencode-provider-tags/issues"
+  },
+  "homepage": "https://github.com/Realmagnum/opencode-provider-tags#readme",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "opencode-desktop",
+    "opencode-gui",
+    "models",
+    "providers",
+    "provider-tags",
+    "disambiguation"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./gui-experimental": "./dist/gui-experimental.cjs"
+  },
+  "files": [
+    "dist",
+    "src",
+    "gui-experimental.cjs",
+    "server.js",
+    "canonical-models.json",
+    "settings.json",
+    "README.md",
+    "README_RU.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "@opencode/plugin": "^2.2.5",
+    "@types/node": "^26.6.6",
+    "solid-js": "^1.9.18",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6",
+    "vite-plugin-solid": "^2.11.15",
+    "yaml": "^2.9.1"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1"
+  }
+}

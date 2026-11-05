@@ -1,0 +1,38 @@
+export type SupportedLocale = "en" | "ru";
+export type TranslationParams = Record<string, string | number | boolean>;
+export declare const I18N_EN: {
+    "settings.title": string;
+    "settings.header.title": string;
+    "settings.header.desc": string;
+    "settings.example.title": string;
+    "settings.switch.title": string;
+    "settings.switch.desc": string;
+    "settings.table.title": string;
+    "settings.table.btn.defaults": string;
+    "settings.table.col.provider": string;
+    "settings.table.col.models": string;
+    "settings.table.col.tag": string;
+    "settings.table.loading": string;
+    "settings.table.empty": string;
+    "settings.status.clean": string;
+    "settings.status.dirty": string;
+    "settings.status.errors": string;
+    "settings.btn.reset": string;
+    "settings.btn.apply": string;
+    "settings.btn.applying": string;
+    "settings.btn.resetting": string;
+    "settings.confirm.reset": string;
+    "settings.help": string;
+    "gear.title": string;
+    "error.maxLength": string;
+    "error.invalidChars": string;
+    "error.unclosedBrackets": string;
+    "error.duplicate": string;
+};
+export type I18nKey = keyof typeof I18N_EN;
+export declare const I18N_RU: Record<I18nKey, string>;
+export declare const I18N_CATALOG: {
+    en: Record<I18nKey, string>;
+    [locale: string]: Record<I18nKey, string>;
+};
+export declare function resolveTranslation(locale: string | undefined, key: string, params?: TranslationParams): string;
